@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	   	http://www.springframework.org/schema/beans
+	   	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   	http://www.springframework.org/schema/tx
+	   	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- Conexion a la base de datos -->
+	<bean id="connection" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost/gc" />
+		<property name="username" value="root" />
+		<property name="password" value="" />
+	</bean>
+
+	<!-- Session Factory con anotaciones -->
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="connection" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.connection.useUnicode">true</prop>
+				<prop key="hibernate.connection.characterEncoding">UTF-8</prop>
+				<prop key="hibernate.connection.charSet">UTF-8</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">TRUE</prop>
+			</props>
+		</property>
+		<!-- Entidades mapeadas -->
+		<property name="annotatedClasses">
+			<list>
+				<value>com.gi2vi.gc.main.persistence.model.Pais</value>
+				<value>com.gi2vi.gc.main.persistence.model.Estado</value>
+				<value>com.gi2vi.gc.main.persistence.model.Dependencia</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Transaction manager -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+</beans>

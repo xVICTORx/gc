@@ -1,0 +1,236 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<!-- Mensajes flotantes -->
+	<p:growl id="growlMessages"></p:growl>
+
+	<!-- Panel principal -->
+	<ui:decorate template="/WEB-INF/web/facelets/layout/panel.xhtml">
+		<ui:param name="header" value="#{msg['catalogo.dependencia.titulo']}" />
+		<ui:define name="body">
+			<h:form id="frmDependenciaTable">
+				<p:dataTable value="#{catalogoDependencia.lazyDependenciaDataModel}"
+					var="dependencia" widgetVar="dependenciaTable" paginator="true"
+					rows="10" id="dependenciaTable" rowsPerPageTemplate="10,20,30"
+					emptyMessage="Sin resultados" paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					selection="#{catalogoDependencia.dependencia}"
+					selectionMode="single" rowKey="#{dependencia.idDependencia}">
+					<p:ajax event="rowSelect" update="dependenciaTable" />
+					<p:ajax event="rowEdit"
+						listener="#{catalogoDependencia.editListener}"
+						update=":growlMessages dependenciaTable" />
+					<f:facet name="header">
+						<p:toolbar>
+							<p:toolbarGroup align="left">
+								<p:commandButton onclick="addDependenciaDialog.show()"
+									action="#{catalogoDependencia.clearFrm}"
+									update=":frmDependencia" value="#{msg['button.add']}"
+									icon="ui-icon-plusthick">
+								</p:commandButton>
+							</p:toolbarGroup>
+						</p:toolbar>
+					</f:facet>
+					<p:column
+						headerText="#{msg['catalogo.dependencia.table.column.nombre']}"
+						filterBy="#{dependencia.nombre}" sortBy="#{dependencia.nombre}">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{dependencia.nombre}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText style="width: 80px;" value="#{dependencia.nombre}"
+									required="true"
+									requiredMessage="#{msg['catalogo.dependencia.table.form.nombre.required']}">
+									<p:ajax event="change" update=":growlMessages"></p:ajax>
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column
+						headerText="#{msg['catalogo.dependencia.table.column.telefono']}"
+						filterBy="#{dependencia.telefono}"
+						sortBy="#{dependencia.telefono}">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{dependencia.telefono}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputMask style="width: 80px;"
+									value="#{dependencia.telefono}" mask="(999) 999-9999" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column
+						headerText="#{msg['catalogo.dependencia.table.column.direccion']}"
+						filterBy="#{dependencia.direccion}"
+						sortBy="#{dependencia.direccion}">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{dependencia.direccion}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText style="width: 80px;"
+									value="#{dependencia.direccion}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column
+						headerText="#{msg['catalogo.dependencia.table.column.cp']}"
+						filterBy="#{dependencia.cp}" sortBy="#{dependencia.cp}">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{dependencia.cp}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText style="width: 80px;" value="#{dependencia.cp}">
+									<p:ajax event="change" update=":growlMessages"></p:ajax>
+									<f:validateLength minimum="5" maximum="10" />
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column
+						headerText="#{msg['catalogo.dependencia.table.column.municipio']}"
+						filterBy="#{dependencia.municipio}"
+						sortBy="#{dependencia.municipio}">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{dependencia.municipio}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText style="width: 80px;"
+									value="#{dependencia.municipio}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column
+						headerText="#{msg['catalogo.dependencia.table.column.estado']}"
+						filterBy="#{dependencia.estado}" sortBy="#{dependencia.estado}"
+						filterOptions="#{catalogoDependencia.estados}">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{dependencia.estado.nombre}" />
+							</f:facet>
+							<f:facet name="input">
+								<h:selectOneMenu value="#{dependencia.estado.idEstado}"
+									required="true"
+									requiredMessage="#{msg['catalogo.dependencia.table.form.estado.required']}">
+									<p:ajax event="change" update=":growlMessages"></p:ajax>
+									<f:selectItems value="#{catalogoDependencia.estados}" />
+								</h:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Opciones">
+						<p:rowEditor />
+						<p:commandLink onclick="confirmDeleteDialog.show()">
+							<span class="ui-icon ui-icon-trash"></span>
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</ui:define>
+	</ui:decorate>
+	<!--	 Dialog para confirmar eliminacion -->
+	<ui:decorate template="/WEB-INF/web/facelets/layout/popup.xhtml">
+		<ui:param name="id" value="confirmDeleteDialog"></ui:param>
+		<ui:param name="widgetVar" value="confirmDeleteDialog"></ui:param>
+		<ui:param name="visible" value="false"></ui:param>
+		<ui:param name="header" value="Confirmar"></ui:param>
+		<ui:param name="modal" value="true"></ui:param>
+		<ui:define name="body">
+			<h:form>
+				<h:outputText value="#{msg['catalogo.dependencia.delete']}" />
+				<div style="text-align: right; width: 100%; margin-top: 20px;">
+					<p:commandButton value="Aceptar"
+						action="#{catalogoDependencia.deleteListener}"
+						update=":growlMessages :frmDependenciaTable"
+						oncomplete="confirmDeleteDialog.hide()" />
+					<p:commandButton value="Cancelar"
+						onclick="confirmDeleteDialog.hide()" />
+				</div>
+			</h:form>
+		</ui:define>
+	</ui:decorate>
+
+	<ui:decorate template="/WEB-INF/web/facelets/layout/popup.xhtml">
+		<ui:param name="id" value="addDependenciaDialog"></ui:param>
+		<ui:param name="widgetVar" value="addDependenciaDialog"></ui:param>
+		<ui:param name="visible" value="false"></ui:param>
+		<ui:param name="header"
+			value="#{msg['catalogo.dependencia.popup.header']}"></ui:param>
+		<ui:param name="modal" value="true"></ui:param>
+		<ui:define name="body">
+			<h:form id="frmDependencia">
+				<p:fieldset>
+					<h:panelGrid columns="2">
+						<h:outputLabel value="#{msg['catalogo.dependencia.form.nombre']}"
+							for="nombreDependencia" />
+						<p:inputText value="#{catalogoDependencia.nombreDependencia}"
+							id="nombreDependencia" style="width: 250px" required="true"
+							requiredMessage="#{msg['catalogo.dependencia.table.form.nombre.required']}">
+							<p:ajax event="change" update=":growlMessages"></p:ajax>
+						</p:inputText>
+
+						<h:outputLabel
+							value="#{msg['catalogo.dependencia.form.telefono']}"
+							for="telefonoDependencia" />
+						<p:inputMask value="#{catalogoDependencia.telefonoDependencia}"
+							id="telefonoDependencia" style="width: 250px"
+							mask="(999) 999-9999">
+						</p:inputMask>
+
+						<h:outputLabel
+							value="#{msg['catalogo.dependencia.form.direccion']}"
+							for="direccionDependencia" />
+						<p:inputText value="#{catalogoDependencia.direccionDependencia}"
+							id="direccionDependencia" style="width: 250px">
+						</p:inputText>
+
+						<h:outputLabel value="#{msg['catalogo.dependencia.form.cp']}"
+							for="cpDependencia" />
+						<p:inputText value="#{catalogoDependencia.cpDependencia}"
+							id="cpDependencia" style="width: 250px">
+						</p:inputText>
+
+						<h:outputLabel
+							value="#{msg['catalogo.dependencia.form.municipio']}"
+							for="municipioDependencia" />
+						<p:inputText value="#{catalogoDependencia.municipioDependencia}"
+							id="municipioDependencia" style="width: 250px">
+						</p:inputText>
+
+						<h:outputLabel value="#{msg['catalogo.dependencia.form.estado']}"
+							for="estadoDependencia" />
+
+						<p:selectOneMenu style="width:263px;"
+							value="#{catalogoDependencia.estadoDependencia}"
+							id="estadoDependencia" required="true"
+							requiredMessage="#{msg['catalogo.dependencia.table.form.estado.required']}">
+							<p:ajax event="change" update=":growlMessages"></p:ajax>
+							<f:selectItems value="#{catalogoDependencia.estados}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+				</p:fieldset>
+				<div style="text-align: right; width: 100%; margin-top: 10px;">
+					<p:commandButton value="Guardar"
+						action="#{catalogoDependencia.saveDependencia}"
+						update="@form :growlMessages :frmDependenciaTable" process="@form"
+						icon="ui-icon-check" />
+					<p:commandButton value="Cancelar"
+						onclick="addDependenciaDialog.hide()" icon="ui-icon-close" />
+				</div>
+			</h:form>
+		</ui:define>
+	</ui:decorate>
+</ui:composition>

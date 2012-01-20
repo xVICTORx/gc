@@ -1,0 +1,14 @@
+html {
+	font-size: 11px;
+}
+
+body {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+#modulo {
+	margin: 0 auto;
+	float: left;
+	margin-top: 20px;
+}

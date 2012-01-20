@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Project GC</title>
+	<h:outputStylesheet library="css" name="common.css"></h:outputStylesheet>
+</h:head>
+<body>
+	<h:form>
+		<p:menubar model="#{menuController.menu}">
+		</p:menubar>
+	</h:form>
+	<div id="modulo">
+		<ui:insert name="body" />
+	</div>
+</body>
+
+</html>
